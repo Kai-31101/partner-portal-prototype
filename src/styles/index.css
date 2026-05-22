@@ -1,0 +1,34 @@
+@import './fonts.css';
+@import './tailwind.css';
+@import './theme.css';
+
+.overview-card-grid {
+  display: grid;
+  align-items: stretch;
+  gap: 1.25rem;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 340px), 1fr));
+}
+
+.overview-card-grid > div {
+  height: 420px;
+  min-height: 420px;
+}
+
+.overview-card-scroll {
+  min-height: 0;
+  overflow-y: auto;
+  padding-right: 0.25rem;
+}
+
+@media (min-width: 1680px) {
+  .overview-card-grid {
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 380px), 1fr));
+  }
+}
+
+@media (max-width: 767px) {
+  .overview-card-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+}

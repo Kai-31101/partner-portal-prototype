@@ -1,0 +1,2444 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Arobid Partner Portal Shell</title>
+  <style>
+    :root {
+      --page: #eef2f6;
+      --main: #f7f9fc;
+      --card: #ffffff;
+      --sidebar: #15212f;
+      --sidebar-soft: #213145;
+      --sidebar-active: #2a3d54;
+      --text: #17202a;
+      --soft-text: #56657a;
+      --muted: #8fa0b3;
+      --line: rgba(255, 255, 255, .13);
+      --card-line: #d9e1ea;
+      --teal: #0f766e;
+      --blue: #2563eb;
+      --green: #16834a;
+      --amber: #b7791f;
+      --red: #c24132;
+      --violet: #7c3aed;
+      --shadow: 0 1px 2px rgba(23, 32, 42, .08);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      background: var(--page);
+      color: var(--text);
+      font-family: Arial, "Segoe UI", sans-serif;
+      letter-spacing: 0;
+    }
+
+    button {
+      font: inherit;
+    }
+
+    .portal {
+      width: 1280px;
+      min-height: 100vh;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 284px 996px;
+      background: var(--main);
+    }
+
+    .sidebar {
+      min-height: 100vh;
+      background: var(--sidebar);
+      color: #eaf0f6;
+      padding: 18px 14px;
+    }
+
+    .brand {
+      display: grid;
+      grid-template-columns: 44px 1fr;
+      gap: 11px;
+      align-items: center;
+      padding: 8px 8px 18px;
+      border-bottom: 1px solid var(--line);
+      margin-bottom: 14px;
+    }
+
+    .brand-mark {
+      width: 44px;
+      height: 44px;
+      border-radius: 8px;
+      display: grid;
+      place-items: center;
+      background: linear-gradient(135deg, #15a39a, #2563eb);
+      color: #fff;
+      font-weight: 800;
+      font-size: 18px;
+    }
+
+    .brand-title {
+      font-size: 17px;
+      font-weight: 800;
+    }
+
+    .brand-subtitle {
+      margin-top: 3px;
+      color: #aeb9c6;
+      font-size: 12px;
+    }
+
+    .nav-label {
+      padding: 7px 8px 9px;
+      color: #aeb9c6;
+      font-size: 11px;
+      text-transform: uppercase;
+      font-weight: 800;
+      letter-spacing: .08em;
+    }
+
+    .nav {
+      display: grid;
+      gap: 6px;
+    }
+
+    .module {
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    .module-button {
+      width: 100%;
+      border: 0;
+      border-radius: 8px;
+      color: #dce5ef;
+      background: transparent;
+      display: grid;
+      grid-template-columns: 30px 1fr 18px;
+      align-items: center;
+      gap: 9px;
+      padding: 10px 9px;
+      cursor: pointer;
+      text-align: left;
+    }
+
+    .module-title,
+    .subnav-label {
+      min-width: 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .nav-badge {
+      min-width: 22px;
+      height: 18px;
+      border-radius: 999px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 6px;
+      background: #1c8b7a;
+      color: #fff;
+      font-size: 11px;
+      font-weight: 800;
+      line-height: 1;
+      flex: 0 0 auto;
+    }
+
+    .module-button:hover,
+    .module.open .module-button,
+    .module.selected .module-button {
+      background: var(--sidebar-soft);
+      color: #fff;
+    }
+
+    .nav-code {
+      height: 26px;
+      width: 30px;
+      border-radius: 7px;
+      display: grid;
+      place-items: center;
+      background: rgba(255, 255, 255, .10);
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .chevron {
+      color: #aeb9c6;
+      font-size: 13px;
+      transition: transform .18s ease;
+    }
+
+    .module.open .chevron {
+      transform: rotate(90deg);
+    }
+
+    .subnav {
+      display: none;
+      margin: 5px 0 8px 39px;
+      padding-left: 10px;
+      border-left: 1px solid rgba(255, 255, 255, .16);
+      gap: 4px;
+    }
+
+    .module.open .subnav {
+      display: grid;
+    }
+
+    .subnav button {
+      border: 0;
+      background: transparent;
+      color: #b8c5d3;
+      border-radius: 7px;
+      padding: 8px 9px;
+      cursor: pointer;
+      text-align: left;
+      font-size: 13px;
+    }
+
+    .subnav button:hover,
+    .subnav button.active {
+      background: var(--sidebar-active);
+      color: #fff;
+    }
+
+    .main-screen {
+      min-height: 100vh;
+      background: var(--main);
+      padding: 22px;
+      overflow: auto;
+    }
+
+    .overview-screen {
+      display: block;
+    }
+
+    .overview-screen.hidden {
+      display: none;
+    }
+
+    .screen-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 16px;
+      margin-bottom: 18px;
+    }
+
+    .breadcrumb {
+      color: var(--soft-text);
+      font-size: 13px;
+      margin-bottom: 8px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 30px;
+      line-height: 1.15;
+      letter-spacing: 0;
+      font-weight: 700;
+      color: #14194f;
+    }
+
+    .screen-actions {
+      display: flex;
+      gap: 10px;
+    }
+
+    .filter-button {
+      height: 36px;
+      border: 1px solid #cfd8e3;
+      background: #fff;
+      color: #263241;
+      border-radius: 4px;
+      padding: 0 12px;
+      cursor: pointer;
+    }
+
+    .dashboard-section {
+      margin-bottom: 18px;
+    }
+
+    .section-title {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin: 0 0 10px;
+    }
+
+    .section-title h2 {
+      margin: 0;
+      color: #253047;
+      font-size: 15px;
+      text-transform: uppercase;
+      letter-spacing: .04em;
+    }
+
+    .section-title span {
+      color: var(--soft-text);
+      font-size: 12px;
+    }
+
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+      align-items: start;
+    }
+
+    .chart-card {
+      height: 224px;
+      background: var(--card);
+      border: 1px solid var(--card-line);
+      border-radius: 6px;
+      box-shadow: var(--shadow);
+      padding: 15px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .chart-card.tall {
+      height: 286px;
+    }
+
+    .card-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .card-header > div:first-child {
+      min-width: 0;
+    }
+
+    .card-title {
+      font-weight: 800;
+      font-size: 15px;
+      line-height: 1.35;
+      color: #1f2933;
+      overflow-wrap: anywhere;
+    }
+
+    .card-subtitle {
+      color: var(--soft-text);
+      font-size: 11px;
+      line-height: 1.35;
+      margin-top: 5px;
+      text-transform: uppercase;
+      font-weight: 700;
+    }
+
+    .chart-type {
+      display: none;
+    }
+
+    .card-cta {
+      border: 0;
+      background: transparent;
+      color: #007ace;
+      cursor: pointer;
+      font-size: 13px;
+      padding: 2px 0;
+      white-space: nowrap;
+    }
+
+    .metric-row {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    .metric-value {
+      font-size: 30px;
+      line-height: 1;
+      color: #111827;
+    }
+
+    .metric-trend {
+      color: var(--green);
+      font-size: 18px;
+    }
+
+    .metric-trend.down {
+      color: var(--red);
+    }
+
+    .metric-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .metric-tile {
+      border: 1px solid #e1e7ee;
+      border-radius: 5px;
+      padding: 8px;
+      background: #fbfcfe;
+      min-width: 0;
+    }
+
+    .metric-label {
+      color: var(--soft-text);
+      font-size: 11px;
+      line-height: 1.25;
+      font-weight: 800;
+    }
+
+    .metric-number {
+      margin-top: 5px;
+      font-weight: 800;
+      font-size: 17px;
+      color: #111827;
+    }
+
+    .formula-note {
+      display: none;
+      margin-top: 10px;
+      border-top: 1px solid #edf1f5;
+      padding-top: 8px;
+      color: #5f6f84;
+      font-size: 11px;
+      line-height: 1.35;
+    }
+
+    .formula-note strong {
+      color: #344155;
+    }
+
+    .card-meta {
+      display: none;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 7px;
+    }
+
+    .meta-pill {
+      border: 1px solid #d7e0ea;
+      border-radius: 999px;
+      padding: 3px 7px;
+      color: #526176;
+      background: #f8fafc;
+      font-size: 11px;
+      white-space: nowrap;
+    }
+
+    .chart-zone {
+      min-height: 112px;
+      overflow-y: auto;
+      padding-right: 3px;
+    }
+
+    .chart-card.tall .chart-zone {
+      min-height: 174px;
+    }
+
+    .chart-zone::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    .chart-zone::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 999px;
+    }
+
+    .mini-line {
+      height: 98px;
+      position: relative;
+      border-bottom: 1px solid #cfd8e3;
+      background:
+        repeating-linear-gradient(to right, transparent 0, transparent 72px, rgba(207, 216, 227, .55) 73px),
+        repeating-linear-gradient(to bottom, transparent 0, transparent 22px, rgba(207, 216, 227, .55) 23px);
+      overflow: hidden;
+      margin-top: auto;
+    }
+
+    .mini-line svg,
+    .mini-bars svg,
+    .donut svg {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    .legend {
+      display: flex;
+      justify-content: flex-end;
+      gap: 14px;
+      margin-top: 10px;
+      color: var(--soft-text);
+      font-size: 12px;
+    }
+
+    .legend span::before {
+      content: "";
+      display: inline-block;
+      width: 11px;
+      height: 11px;
+      border-radius: 3px;
+      margin-right: 6px;
+      vertical-align: -1px;
+      background: #c4ccd6;
+    }
+
+    .legend .today::before {
+      background: var(--violet);
+    }
+
+    .legend .teal::before {
+      background: #55c7bd;
+    }
+
+    .mini-bars {
+      height: 96px;
+      margin-top: 8px;
+    }
+
+    .stacked-list,
+    .plain-list {
+      display: grid;
+      gap: 0;
+      border: 1px solid #d8e1ea;
+      border-radius: 5px;
+      overflow: hidden;
+      background: #fff;
+    }
+
+    .scroll-list {
+      max-height: 178px;
+      overflow-y: auto;
+      padding-right: 4px;
+    }
+
+    .chart-card.tall .scroll-list {
+      max-height: 222px;
+    }
+
+    .scroll-list::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    .scroll-list::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 999px;
+    }
+
+    .stacked-row,
+    .plain-row {
+      display: grid;
+      grid-template-columns: minmax(112px, 1.15fr) minmax(90px, .9fr) minmax(72px, .65fr);
+      align-items: center;
+      gap: 10px;
+      font-size: 13px;
+      color: #2c3747;
+      min-height: 34px;
+      padding: 8px 9px;
+      border-bottom: 1px solid #e4eaf1;
+    }
+
+    .stacked-row:last-child,
+    .plain-row:last-child,
+    .funnel-row:last-child,
+    .progress-row:last-child {
+      border-bottom: 0;
+    }
+
+    .table-header {
+      display: grid;
+      align-items: center;
+      gap: 10px;
+      min-height: 30px;
+      padding: 7px 9px;
+      background: #f1f5f9;
+      border-bottom: 1px solid #d8e1ea;
+      color: #4a596d;
+      font-size: 11px;
+      font-weight: 800;
+      text-transform: uppercase;
+      position: sticky;
+      top: 0;
+      z-index: 2;
+    }
+
+    .plain-list .table-header,
+    .stacked-list .table-header {
+      grid-template-columns: minmax(112px, 1.15fr) minmax(90px, .9fr) minmax(72px, .65fr);
+    }
+
+    .table-header span,
+    .plain-row > span,
+    .plain-row > strong,
+    .stacked-row > span,
+    .stacked-row > strong,
+    .funnel-row > span,
+    .funnel-row > strong,
+    .progress-row > span,
+    .progress-row > strong {
+      min-width: 0;
+    }
+
+    .table-header span:not(:first-child),
+    .plain-row > span:not(:first-child),
+    .plain-row > strong,
+    .stacked-row > strong,
+    .funnel-row > strong,
+    .progress-row > strong {
+      text-align: right;
+      white-space: nowrap;
+    }
+
+    .plain-row > span:first-child,
+    .stacked-row > span:first-child,
+    .table-header span:first-child {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .stacked-track {
+      height: 12px;
+      display: flex;
+      overflow: hidden;
+      border-radius: 999px;
+      background: #e8edf3;
+    }
+
+    .stacked-fill.used {
+      background: var(--teal);
+    }
+
+    .stacked-fill.remaining {
+      background: #cbd5e1;
+    }
+
+    .funnel {
+      display: grid;
+      gap: 0;
+      border: 1px solid #d8e1ea;
+      border-radius: 5px;
+      overflow: hidden;
+      background: #fff;
+    }
+
+    .funnel-row {
+      display: grid;
+      grid-template-columns: 1fr 70px 42px;
+      gap: 10px;
+      align-items: center;
+      font-size: 13px;
+      min-height: 34px;
+      padding: 8px 9px;
+      border-bottom: 1px solid #e4eaf1;
+    }
+
+    .funnel .table-header {
+      grid-template-columns: 1fr 70px 42px;
+    }
+
+    .funnel-bar {
+      height: 18px;
+      border-radius: 4px;
+      background: var(--violet);
+    }
+
+    .progress-list {
+      display: grid;
+      gap: 0;
+      border: 1px solid #d8e1ea;
+      border-radius: 5px;
+      overflow: hidden;
+      background: #fff;
+    }
+
+    .progress-row {
+      display: grid;
+      grid-template-columns: 118px 1fr 44px;
+      gap: 10px;
+      align-items: center;
+      font-size: 13px;
+      min-height: 34px;
+      padding: 8px 9px;
+      border-bottom: 1px solid #e4eaf1;
+    }
+
+    .progress-list .table-header {
+      grid-template-columns: 118px 1fr 44px;
+    }
+
+    .progress-track {
+      height: 8px;
+      border-radius: 999px;
+      background: #e4eaf1;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: var(--teal);
+    }
+
+    .alert-list {
+      display: grid;
+      gap: 9px;
+    }
+
+    .alert-row {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 10px;
+      border-top: 1px solid #edf1f5;
+      padding-top: 9px;
+      font-size: 13px;
+    }
+
+    .priority {
+      border-radius: 999px;
+      padding: 3px 7px;
+      font-size: 11px;
+      font-weight: 800;
+      background: #fff1ef;
+      color: var(--red);
+      align-self: start;
+    }
+
+    .priority.medium {
+      background: #fff7df;
+      color: var(--amber);
+    }
+
+    .blank-screen {
+      display: none;
+      min-height: calc(100vh - 44px);
+    }
+
+    .blank-screen.active {
+      display: block;
+    }
+
+    .feature-screen {
+      display: none;
+    }
+
+    .feature-screen.active {
+      display: block;
+    }
+
+    .feature-summary {
+      display: block;
+      margin-bottom: 14px;
+    }
+
+    .feature-panel {
+      background: #fff;
+      border: 1px solid var(--card-line);
+      border-radius: 6px;
+      box-shadow: var(--shadow);
+      padding: 16px;
+    }
+
+    .feature-panel h2,
+    .feature-panel h3 {
+      margin: 0;
+      color: #1f2933;
+    }
+
+    .feature-panel h2 {
+      font-size: 20px;
+    }
+
+    .feature-panel h3 {
+      font-size: 15px;
+      margin-bottom: 12px;
+    }
+
+    .feature-desc {
+      color: var(--soft-text);
+      font-size: 13px;
+      line-height: 1.5;
+      margin-top: 8px;
+    }
+
+    .field-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    .field-box {
+      border: 1px solid #d8e1ea;
+      border-radius: 5px;
+      background: #fbfcfe;
+      padding: 10px;
+      min-height: 58px;
+    }
+
+    .field-label {
+      color: #56657a;
+      font-size: 11px;
+      text-transform: uppercase;
+      font-weight: 800;
+      margin-bottom: 5px;
+    }
+
+    .field-value {
+      color: #111827;
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .config-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+      margin-top: 16px;
+    }
+
+    .config-group {
+      border: 1px solid #d8e1ea;
+      border-radius: 6px;
+      background: #fbfcfe;
+      padding: 14px;
+    }
+
+    .config-group.wide {
+      grid-column: 1 / -1;
+    }
+
+    .config-title {
+      margin: 0 0 10px;
+      color: #1f2933;
+      font-size: 14px;
+      font-weight: 800;
+    }
+
+    .upload-grid,
+    .status-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .upload-box {
+      min-height: 126px;
+      border: 1px dashed #9db0c4;
+      border-radius: 6px;
+      background: #fff;
+      display: grid;
+      align-content: center;
+      justify-items: center;
+      gap: 8px;
+      padding: 14px;
+      text-align: center;
+    }
+
+    .upload-icon {
+      width: 34px;
+      height: 34px;
+      border-radius: 999px;
+      display: grid;
+      place-items: center;
+      background: #e7f5f2;
+      color: var(--teal);
+      font-size: 18px;
+      font-weight: 800;
+    }
+
+    .upload-name {
+      color: #111827;
+      font-size: 14px;
+      font-weight: 800;
+    }
+
+    .upload-current {
+      color: var(--soft-text);
+      font-size: 12px;
+      line-height: 1.35;
+    }
+
+    .upload-button {
+      border: 1px solid #cfd8e3;
+      border-radius: 4px;
+      background: #fff;
+      color: var(--blue);
+      cursor: pointer;
+      height: 30px;
+      padding: 0 10px;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .config-list {
+      border: 1px solid #d8e1ea;
+      border-radius: 6px;
+      overflow: hidden;
+      background: #fff;
+    }
+
+    .config-list-header,
+    .media-list-row,
+    .content-list-row {
+      display: grid;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 12px;
+      border-bottom: 1px solid #e4eaf1;
+    }
+
+    .config-list-header {
+      background: #f1f5f9;
+      color: #4a596d;
+      font-size: 11px;
+      text-transform: uppercase;
+      font-weight: 800;
+    }
+
+    .media-list-row,
+    .content-list-row {
+      min-height: 66px;
+    }
+
+    .media-list-row:last-child,
+    .content-list-row:last-child {
+      border-bottom: 0;
+    }
+
+    .media-list-header,
+    .media-list-row {
+      grid-template-columns: minmax(160px, .9fr) minmax(220px, 1.25fr) minmax(150px, .75fr) minmax(120px, .6fr);
+    }
+
+    .content-list-header,
+    .content-list-row {
+      grid-template-columns: minmax(160px, .8fr) minmax(360px, 1.6fr);
+    }
+
+    .asset-cell {
+      display: grid;
+      grid-template-columns: 34px 1fr;
+      gap: 10px;
+      align-items: center;
+      min-width: 0;
+    }
+
+    .asset-cell .upload-icon {
+      width: 30px;
+      height: 30px;
+      font-size: 16px;
+    }
+
+    .config-select {
+      width: 100%;
+      height: 36px;
+      border: 1px solid #cfd8e3;
+      border-radius: 5px;
+      background: #fff;
+      color: #111827;
+      font: inherit;
+      font-size: 13px;
+      padding: 0 9px;
+    }
+
+    .content-list-row .form-field label {
+      display: none;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .form-field {
+      display: grid;
+      gap: 6px;
+    }
+
+    .form-field.full {
+      grid-column: 1 / -1;
+    }
+
+    .form-field label,
+    .toggle-label {
+      color: #56657a;
+      font-size: 11px;
+      text-transform: uppercase;
+      font-weight: 800;
+    }
+
+    .form-input,
+    .form-textarea {
+      width: 100%;
+      border: 1px solid #cfd8e3;
+      border-radius: 5px;
+      background: #fff;
+      color: #111827;
+      font: inherit;
+      font-size: 13px;
+      padding: 9px 10px;
+    }
+
+    .form-textarea {
+      min-height: 76px;
+      resize: vertical;
+      line-height: 1.45;
+    }
+
+    .status-control {
+      border: 1px solid #d8e1ea;
+      border-radius: 6px;
+      background: #fff;
+      padding: 12px;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .status-copy {
+      color: var(--soft-text);
+      font-size: 12px;
+      margin-top: 4px;
+    }
+
+    .toggle-switch {
+      position: relative;
+      width: 46px;
+      height: 26px;
+      flex: 0 0 auto;
+    }
+
+    .toggle-switch input {
+      position: absolute;
+      opacity: 0;
+    }
+
+    .toggle-track {
+      position: absolute;
+      inset: 0;
+      border-radius: 999px;
+      background: #c8d4e1;
+      transition: background .18s ease;
+    }
+
+    .toggle-track::after {
+      content: "";
+      position: absolute;
+      width: 20px;
+      height: 20px;
+      left: 3px;
+      top: 3px;
+      border-radius: 999px;
+      background: #fff;
+      box-shadow: 0 1px 2px rgba(23, 32, 42, .2);
+      transition: transform .18s ease;
+    }
+
+    .toggle-switch input:checked + .toggle-track {
+      background: var(--teal);
+    }
+
+    .toggle-switch input:checked + .toggle-track::after {
+      transform: translateX(20px);
+    }
+
+    .feature-table {
+      width: 100%;
+      border: 1px solid #d8e1ea;
+      border-radius: 6px;
+      overflow: hidden;
+      background: #fff;
+    }
+
+    .feature-table-row,
+    .feature-table-header {
+      display: grid;
+      grid-template-columns: minmax(160px, 1.1fr) minmax(120px, .8fr) minmax(120px, .8fr) minmax(120px, .8fr);
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      border-bottom: 1px solid #e4eaf1;
+      font-size: 13px;
+    }
+
+    .feature-table-header {
+      position: sticky;
+      top: 0;
+      z-index: 2;
+      background: #f1f5f9;
+      color: #4a596d;
+      font-size: 11px;
+      text-transform: uppercase;
+      font-weight: 800;
+    }
+
+    .feature-table-row:last-child {
+      border-bottom: 0;
+    }
+
+    .member-table .feature-table-row,
+    .member-table .feature-table-header {
+      grid-template-columns: minmax(220px, 1.35fr) minmax(140px, .75fr) minmax(150px, .7fr);
+    }
+
+    .expo-table .feature-table-row,
+    .expo-table .feature-table-header {
+      grid-template-columns: minmax(180px, 1.2fr) minmax(110px, .7fr) minmax(90px, .55fr) minmax(90px, .55fr) minmax(110px, .7fr) minmax(120px, .65fr);
+    }
+
+    .setup-table .feature-table-row,
+    .setup-table .feature-table-header {
+      grid-template-columns: minmax(150px, .9fr) minmax(140px, .8fr) minmax(160px, 1fr) minmax(130px, .7fr);
+    }
+
+    .invite-code-table .feature-table-row,
+    .invite-code-table .feature-table-header {
+      grid-template-columns: minmax(150px, .9fr) minmax(180px, 1fr) minmax(160px, .9fr) minmax(130px, .7fr);
+    }
+
+    .communication-chat-table .feature-table-row,
+    .communication-chat-table .feature-table-header {
+      grid-template-columns: minmax(170px, 1fr) minmax(150px, .9fr) minmax(180px, 1fr) minmax(110px, .6fr) minmax(110px, .6fr);
+    }
+
+    .notification-feed {
+      display: grid;
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    .notification-item {
+      width: 100%;
+      border: 1px solid #d8e1ea;
+      border-radius: 6px;
+      background: #fff;
+      padding: 14px 16px;
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      gap: 12px;
+      align-items: start;
+      cursor: pointer;
+      text-align: left;
+    }
+
+    .notification-item:hover {
+      border-color: #bfd0e2;
+      background: #fcfdff;
+    }
+
+    .notification-body {
+      min-width: 0;
+    }
+
+    .notification-title {
+      margin: 0;
+      color: #111827;
+      font-size: 15px;
+      font-weight: 800;
+      line-height: 1.35;
+    }
+
+    .notification-pretext {
+      margin-top: 6px;
+      color: var(--soft-text);
+      font-size: 13px;
+      line-height: 1.45;
+    }
+
+    .notification-meta {
+      margin-top: 8px;
+      color: #6b7b90;
+      font-size: 12px;
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .notification-time {
+      color: #3b4a5e;
+      font-size: 12px;
+      white-space: nowrap;
+      padding-top: 2px;
+    }
+
+    .notification-modal {
+      position: fixed;
+      inset: 0;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      background: rgba(15, 23, 42, .36);
+      z-index: 50;
+    }
+
+    .notification-modal.open {
+      display: flex;
+    }
+
+    .notification-dialog {
+      width: min(560px, 100%);
+      border-radius: 10px;
+      background: #fff;
+      box-shadow: 0 18px 40px rgba(15, 23, 42, .24);
+      border: 1px solid #d8e1ea;
+      overflow: hidden;
+    }
+
+    .notification-dialog-header,
+    .notification-dialog-body,
+    .notification-dialog-footer {
+      padding: 18px 20px;
+    }
+
+    .notification-dialog-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: start;
+      gap: 12px;
+      border-bottom: 1px solid #e6ecf2;
+    }
+
+    .notification-dialog-title {
+      margin: 8px 0 0;
+      color: #111827;
+      font-size: 20px;
+      line-height: 1.3;
+    }
+
+    .notification-dialog-body {
+      color: #314155;
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    .notification-dialog-footer {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      border-top: 1px solid #e6ecf2;
+    }
+
+    .expo-setting-table .feature-table-row,
+    .expo-setting-table .feature-table-header {
+      grid-template-columns: minmax(180px, 1.2fr) minmax(120px, .7fr) minmax(110px, .6fr) minmax(110px, .6fr) minmax(120px, .7fr) minmax(120px, .7fr);
+    }
+
+    .metric-strip {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 10px;
+      margin-top: 14px;
+      margin-bottom: 14px;
+    }
+
+    .metric-tile {
+      border: 1px solid #d8e1ea;
+      border-radius: 6px;
+      background: #fbfcfe;
+      padding: 12px;
+    }
+
+    .metric-label {
+      color: #56657a;
+      font-size: 11px;
+      text-transform: uppercase;
+      font-weight: 800;
+      margin-bottom: 6px;
+    }
+
+    .metric-number {
+      color: #111827;
+      font-size: 22px;
+      font-weight: 800;
+      line-height: 1.1;
+    }
+
+    .detail-card {
+      border: 1px solid #d8e1ea;
+      border-radius: 6px;
+      background: #fbfcfe;
+      padding: 14px;
+      margin-top: 14px;
+    }
+
+    .detail-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .detail-card-header h3 {
+      margin: 0;
+      font-size: 16px;
+      color: #1f2933;
+    }
+
+    .detail-actions {
+      display: flex;
+      gap: 8px;
+    }
+
+    .action-menu {
+      position: relative;
+      width: 138px;
+    }
+
+    .action-trigger {
+      width: 100%;
+      height: 34px;
+      border: 1px solid #cfd8e3;
+      border-radius: 5px;
+      background: #fff;
+      color: #111827;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      padding: 0 10px;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .action-panel {
+      display: none;
+      position: absolute;
+      top: calc(100% + 4px);
+      right: 0;
+      z-index: 10;
+      min-width: 138px;
+      border: 1px solid #cfd8e3;
+      border-radius: 6px;
+      background: #fff;
+      box-shadow: 0 8px 18px rgba(23, 32, 42, .14);
+      padding: 5px;
+    }
+
+    .action-menu:hover .action-panel,
+    .action-menu:focus-within .action-panel {
+      display: grid;
+      gap: 4px;
+    }
+
+    .action-panel button {
+      border: 0;
+      border-radius: 4px;
+      background: transparent;
+      color: #111827;
+      cursor: pointer;
+      padding: 8px 9px;
+      text-align: left;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .action-panel button:hover {
+      background: #eef4fb;
+    }
+
+    .action-panel button.danger {
+      color: var(--red);
+    }
+
+    .status-pill {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 999px;
+      padding: 4px 8px;
+      font-size: 11px;
+      font-weight: 800;
+      background: #e7f5f2;
+      color: var(--teal);
+      white-space: nowrap;
+      width: fit-content;
+    }
+
+    .status-pill.warn {
+      background: #fff7df;
+      color: var(--amber);
+    }
+
+    .status-pill.stop {
+      background: #fff1ef;
+      color: var(--red);
+    }
+
+    @media (max-width: 1279px) {
+      .portal {
+        width: 100%;
+        grid-template-columns: 284px minmax(0, 1fr);
+      }
+    }
+
+    @media (max-width: 980px) {
+      .card-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="portal">
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-mark">AP</div>
+        <div>
+          <div class="brand-title">Arobid Partner Portal</div>
+          <div class="brand-subtitle">Navigation shell</div>
+        </div>
+      </div>
+
+      <div class="nav-label">Partner portal</div>
+      <nav class="nav" id="sidebarNav" aria-label="Partner Portal navigation"></nav>
+    </aside>
+
+    <main class="main-screen" aria-label="Partner Portal main screen">
+      <section class="overview-screen" id="overviewScreen">
+        <div class="screen-header">
+          <div>
+            <div class="breadcrumb">Reports / Partner Home</div>
+            <h1>Overview dashboard</h1>
+          </div>
+          <div class="screen-actions">
+            <button class="filter-button" type="button">Today</button>
+            <button class="filter-button" type="button">Compared to previous day</button>
+          </div>
+        </div>
+
+        <section class="dashboard-section">
+          <div class="section-title">
+            <h2>Operations Summary</h2>
+            <span>Partner performance snapshot</span>
+          </div>
+          <div class="card-grid">
+            <article class="chart-card tall">
+              <div class="card-header">
+                <div>
+                  <div class="card-title">Partner Operations Summary</div>
+                  <div class="card-meta">
+                    <span class="meta-pill">Grain: partner current + period</span>
+                    <span class="meta-pill">Owner: Partner Ops + Finance</span>
+                  </div>
+                </div>
+                <button class="card-cta" type="button">View members</button>
+              </div>
+              <div class="chart-zone">
+                <div class="metric-grid">
+                  <div class="metric-tile"><div class="metric-label">Active Capability</div><div class="metric-number">4</div></div>
+                  <div class="metric-tile"><div class="metric-label">Activated Enterprises</div><div class="metric-number">1,284</div></div>
+                  <div class="metric-tile"><div class="metric-label">Booths Used</div><div class="metric-number">472</div></div>
+                  <div class="metric-tile"><div class="metric-label">Credits Allocated</div><div class="metric-number">18.4K</div></div>
+                  <div class="metric-tile"><div class="metric-label">RFQs Generated</div><div class="metric-number">396</div></div>
+                  <div class="metric-tile"><div class="metric-label">Deal Contexts</div><div class="metric-number">124</div></div>
+                  <div class="metric-tile"><div class="metric-label">Bundle Sales</div><div class="metric-number">$46K</div></div>
+                  <div class="metric-tile"><div class="metric-label">Revenue</div><div class="metric-number">$128K</div></div>
+                </div>
+                <div class="formula-note"><strong>Formula samples:</strong> activated enterprises = COUNT(DISTINCT company_id) WHERE activation_status = activated; revenue = SUM(recognized_revenue_amount).</div>
+              </div>
+              <div class="legend"><span>Previous period</span><span class="today">Current period</span></div>
+            </article>
+
+            <article class="chart-card tall">
+              <div class="card-header">
+                <div>
+                  <div class="card-title">Partner Activation Funnel</div>
+                  <div class="card-meta">
+                    <span class="meta-pill">Grain: partner period by stage</span>
+                    <span class="meta-pill">Owner: Partner Ops + Data</span>
+                  </div>
+                </div>
+                <button class="card-cta" type="button">View members</button>
+              </div>
+              <div class="chart-zone">
+                <div class="funnel">
+                  <div class="table-header"><span>Stage</span><span>Volume</span><span>Count</span></div>
+                  <div class="funnel-row"><span>invited enterprises</span><div class="funnel-bar" style="width:76px"></div><strong>1,820</strong></div>
+                  <div class="funnel-row"><span>registered enterprises</span><div class="funnel-bar" style="width:64px"></div><strong>1,430</strong></div>
+                  <div class="funnel-row"><span>profile completed enterprises</span><div class="funnel-bar" style="width:52px"></div><strong>1,160</strong></div>
+                  <div class="funnel-row"><span>expo activated enterprises</span><div class="funnel-bar" style="width:42px"></div><strong>884</strong></div>
+                  <div class="funnel-row"><span>RFQ generated enterprises</span><div class="funnel-bar" style="width:30px"></div><strong>396</strong></div>
+                </div>
+                <div class="formula-note"><strong>Definition:</strong> Shows where partner-managed companies drop off in activation funnel. <strong>Source:</strong> funnel events with partner attribution.</div>
+              </div>
+              <div class="legend"><span class="today">Stage count</span><span>Drop-off</span></div>
+            </article>
+
+            <article class="chart-card tall">
+              <div class="card-header">
+                <div>
+                  <div class="card-title">Alerts and Suggested Actions</div>
+                  <div class="card-meta">
+                    <span class="meta-pill">Widget: Partner Operations Summary</span>
+                    <span class="meta-pill">Purpose: next-action area</span>
+                  </div>
+                </div>
+                <button class="card-cta" type="button">Open tasks</button>
+              </div>
+              <div class="chart-zone alert-list">
+                <div class="alert-row"><div><strong>booth inventory low</strong><br><span class="metric-label">Trigger: booth unsold ratio below operating threshold</span></div><span class="priority">High</span></div>
+                <div class="alert-row"><div><strong>dormant enterprises</strong><br><span class="metric-label">Trigger: no activation event after invitation</span></div><span class="priority medium">Medium</span></div>
+                <div class="alert-row"><div><strong>credit expiry</strong><br><span class="metric-label">Credits expiring inside the selected period</span></div><span class="priority">High</span></div>
+                <div class="alert-row"><div><strong>campaign conversion drop</strong><br><span class="metric-label">Compare redemption rate against previous period</span></div><span class="priority medium">Medium</span></div>
+              </div>
+              <div class="legend"><span class="today">High priority</span><span>Medium priority</span></div>
+            </article>
+          </div>
+        </section>
+
+        <section class="dashboard-section">
+          <div class="section-title">
+            <h2>Expo and Inventory</h2>
+            <span>Expo usage and booth capacity</span>
+          </div>
+          <div class="card-grid">
+            <article class="chart-card tall">
+              <div class="card-header">
+                  <div>
+                    <div class="card-title">Booth sold vs unsold</div>
+                    <div class="card-meta">
+                      <span class="meta-pill">Widget: Expo Inventory and Performance Board</span>
+                      <span class="meta-pill">Grain: partner expo period</span>
+                    </div>
+                  </div>
+                <button class="card-cta" type="button">Manage booths</button>
+              </div>
+              <div class="stacked-list scroll-list chart-zone">
+                <div class="table-header"><span>Expo</span><span>Sold vs unsold</span><span>Used</span></div>
+                <div class="stacked-row"><span>Agri Expo</span><div class="stacked-track"><div class="stacked-fill used" style="width:72%"></div><div class="stacked-fill remaining" style="width:28%"></div></div><strong>72%</strong></div>
+                <div class="stacked-row"><span>Textile Week</span><div class="stacked-track"><div class="stacked-fill used" style="width:54%"></div><div class="stacked-fill remaining" style="width:46%"></div></div><strong>54%</strong></div>
+                <div class="stacked-row"><span>Packaging</span><div class="stacked-track"><div class="stacked-fill used" style="width:63%"></div><div class="stacked-fill remaining" style="width:37%"></div></div><strong>63%</strong></div>
+                <div class="stacked-row"><span>Electronics</span><div class="stacked-track"><div class="stacked-fill used" style="width:41%"></div><div class="stacked-fill remaining" style="width:59%"></div></div><strong>41%</strong></div>
+                <div class="formula-note"><strong>Metric formulas:</strong> booth sold = COUNT(DISTINCT booth_id) WHERE booth_sale_status = sold; booth unsold = COUNT(DISTINCT booth_id) WHERE booth_sale_status = unsold.</div>
+              </div>
+              <div class="legend"><span class="teal">Sold</span><span>Unsold</span></div>
+            </article>
+
+            <article class="chart-card tall">
+              <div class="card-header">
+                  <div>
+                    <div class="card-title">Expo inventory board</div>
+                    <div class="card-meta">
+                      <span class="meta-pill">Source: expo records; booth inventory records</span>
+                      <span class="meta-pill">Owner: Expo Ops</span>
+                    </div>
+                  </div>
+                <button class="card-cta" type="button">Open Expo Programs</button>
+              </div>
+              <div class="plain-list scroll-list chart-zone">
+                <div class="table-header"><span>Expo</span><span>Inventory</span><span>Sold</span></div>
+                <div class="plain-row"><span>Agri Expo</span><strong>148 booths</strong><span>106 sold</span></div>
+                <div class="plain-row"><span>Textile Week</span><strong>96 booths</strong><span>52 sold</span></div>
+                <div class="plain-row"><span>Packaging</span><strong>74 booths</strong><span>47 sold</span></div>
+                <div class="plain-row"><span>Electronics</span><strong>112 booths</strong><span>46 sold</span></div>
+                <div class="plain-row"><span>Furniture</span><strong>58 booths</strong><span>21 sold</span></div>
+                <div class="formula-note"><strong>Metrics shown:</strong> expo list, booth sold, booth unsold, visitor statistics, country breakdown, booth performance, pitching sessions, matching volume.</div>
+              </div>
+            </article>
+
+            <article class="chart-card tall">
+              <div>
+                <div class="card-header">
+                  <div>
+                    <div class="card-title">Purchased booth trend</div>
+                    <div class="card-meta">
+                      <span class="meta-pill">Formula: composite_index(views, likes, clicks, saves, meetings)</span>
+                    </div>
+                  </div>
+                  <button class="card-cta" type="button">View report</button>
+                </div>
+                <div class="metric-row">
+                  <div class="metric-value">472</div>
+                  <div class="metric-trend">up 7.1%</div>
+                </div>
+              </div>
+              <div>
+                <div class="mini-line" aria-hidden="true">
+                  <svg viewBox="0 0 260 100" preserveAspectRatio="none">
+                    <polyline points="0,78 28,72 58,66 86,60 116,48 144,52 174,38 204,30 232,24 260,16" fill="none" stroke="#7c3aed" stroke-width="4" />
+                    <polyline points="0,84 28,80 58,74 86,70 116,62 144,58 174,54 204,48 232,42 260,36" fill="none" stroke="#c4ccd6" stroke-width="4" />
+                    <text x="0" y="98" fill="#667789" font-size="9">Jan</text>
+                    <text x="72" y="98" fill="#667789" font-size="9">Mar</text>
+                    <text x="144" y="98" fill="#667789" font-size="9">May</text>
+                    <text x="218" y="98" fill="#667789" font-size="9">Jul</text>
+                  </svg>
+                </div>
+                <div class="legend"><span>Previous period</span><span class="today">Purchased booths</span></div>
+              </div>
+            </article>
+          </div>
+        </section>
+
+        <section class="dashboard-section">
+          <div class="section-title">
+            <h2>Trade Activity</h2>
+            <span>RFQ and deal movement</span>
+          </div>
+          <div class="card-grid">
+            <article class="chart-card">
+              <div class="card-header">
+                <div>
+                  <div class="card-title">Trade pipeline trend</div>
+                  <div class="card-meta">
+                    <span class="meta-pill">Widget: Partner Report Center</span>
+                    <span class="meta-pill">Grain: partner report period</span>
+                  </div>
+                </div>
+                <button class="card-cta" type="button">View trade report</button>
+              </div>
+              <div class="metric-row">
+                <div class="metric-value">396</div>
+                <div class="metric-trend">RFQs</div>
+              </div>
+              <div class="mini-line" aria-hidden="true">
+                <svg viewBox="0 0 260 100" preserveAspectRatio="none">
+                  <polyline points="0,78 30,72 58,66 86,60 116,42 144,48 174,35 204,30 232,22 260,16" fill="none" stroke="#7c3aed" stroke-width="4" />
+                  <polyline points="0,85 30,80 58,74 86,70 116,58 144,55 174,48 204,42 232,38 260,32" fill="none" stroke="#55c7bd" stroke-width="4" />
+                </svg>
+              </div>
+              <div class="formula-note"><strong>Metrics:</strong> RFQs = COUNT(DISTINCT business_object_id); deal contexts = COUNT(DISTINCT deal_id); trade value estimate = SUM(estimated_trade_value_amount).</div>
+              <div class="legend"><span class="today">RFQ</span><span class="teal">DealContext</span></div>
+            </article>
+
+            <article class="chart-card">
+              <div class="card-header">
+                <div>
+                  <div class="card-title">TradeCredits allocated</div>
+                  <div class="card-meta">
+                    <span class="meta-pill">Widget: Credits and Quota Control</span>
+                    <span class="meta-pill">Grain: partner current + future window</span>
+                  </div>
+                </div>
+                <button class="card-cta" type="button">Open wallet</button>
+              </div>
+              <div class="metric-row">
+                <div class="metric-value">18.4K</div>
+                <div class="metric-trend">up 9.2%</div>
+              </div>
+              <div class="progress-list">
+                <div class="table-header"><span>Metric</span><span>Usage</span><span>Rate</span></div>
+                <div class="progress-row"><span>Allocated</span><div class="progress-track"><div class="progress-fill" style="width:74%"></div></div><strong>74%</strong></div>
+                <div class="progress-row"><span>Used</span><div class="progress-track"><div class="progress-fill" style="width:46%"></div></div><strong>46%</strong></div>
+                <div class="progress-row"><span>Expiring</span><div class="progress-track"><div class="progress-fill" style="width:18%; background:#b7791f"></div></div><strong>18%</strong></div>
+                <div class="formula-note"><strong>Metric formulas:</strong> wallet balance = SUM(credit_amount_signed); credit expiry = SUM(value) WHERE expiry_date is inside future window.</div>
+              </div>
+            </article>
+
+            <article class="chart-card">
+              <div class="card-header">
+                <div>
+                  <div class="card-title">RFQ generated</div>
+                </div>
+                <button class="card-cta" type="button">View RFQ report</button>
+              </div>
+              <div class="metric-row">
+                <div class="metric-value">396</div>
+                <div class="metric-trend">up 11.2%</div>
+              </div>
+              <div class="plain-list scroll-list chart-zone">
+                <div class="table-header"><span>RFQ status</span><span>Count</span><span>Trend</span></div>
+                <div class="plain-row"><span>New</span><strong>142</strong><span class="metric-trend">up</span></div>
+                <div class="plain-row"><span>In progress</span><strong>168</strong><span class="metric-trend">up</span></div>
+                <div class="plain-row"><span>Quoted</span><strong>64</strong><span class="metric-trend">up</span></div>
+                <div class="plain-row"><span>Closed</span><strong>22</strong><span class="metric-trend down">flat</span></div>
+              </div>
+            </article>
+          </div>
+        </section>
+
+        <section class="dashboard-section">
+          <div class="section-title">
+            <h2>Revenue and Bundles</h2>
+            <span>Revenue and bundle adoption</span>
+          </div>
+          <div class="card-grid">
+            <article class="chart-card">
+              <div class="card-header">
+                <div>
+                  <div class="card-title">Partner revenue</div>
+                  <div class="card-meta">
+                    <span class="meta-pill">Widget: Partner Revenue Analysis</span>
+                    <span class="meta-pill">Grain: partner period</span>
+                  </div>
+                </div>
+                <button class="card-cta" type="button">Open Finance</button>
+              </div>
+              <div class="metric-row">
+                <div class="metric-value">$128K</div>
+                <div class="metric-trend">up 6.8%</div>
+              </div>
+              <div class="mini-line" aria-hidden="true">
+                <svg viewBox="0 0 260 100" preserveAspectRatio="none">
+                  <polyline points="0,80 30,66 58,72 86,52 116,58 144,38 174,42 204,26 232,34 260,18" fill="none" stroke="#7c3aed" stroke-width="4" />
+                  <polyline points="0,86 30,78 58,74 86,66 116,60 144,55 174,48 204,44 232,39 260,36" fill="none" stroke="#c4ccd6" stroke-width="4" />
+                </svg>
+              </div>
+              <div class="formula-note"><strong>Metrics:</strong> bundle revenue = SUM(bundle_order_amount); monthly settlement = SUM(settlement_amount) GROUP BY settlement_month.</div>
+            </article>
+
+            <article class="chart-card">
+              <div class="card-header">
+                <div>
+                  <div class="card-title">Revenue by capability</div>
+                  <div class="card-meta">
+                    <span class="meta-pill">Formula: SUM/COUNT revenue GROUP BY capability</span>
+                    <span class="meta-pill">Source: revenue ledger; capability mapping</span>
+                  </div>
+                </div>
+                <button class="card-cta" type="button">View analysis</button>
+              </div>
+              <div class="progress-list">
+                <div class="table-header"><span>Capability</span><span>Share</span><span>Revenue</span></div>
+                <div class="progress-row"><span>Expo</span><div class="progress-track"><div class="progress-fill" style="width:82%"></div></div><strong>$52K</strong></div>
+                <div class="progress-row"><span>Bundle</span><div class="progress-track"><div class="progress-fill" style="width:64%"></div></div><strong>$41K</strong></div>
+                <div class="progress-row"><span>Service</span><div class="progress-track"><div class="progress-fill" style="width:39%"></div></div><strong>$25K</strong></div>
+                <div class="progress-row"><span>Credit</span><div class="progress-track"><div class="progress-fill" style="width:18%"></div></div><strong>$10K</strong></div>
+                <div class="formula-note"><strong>Legend:</strong> bar length = share of recognized revenue by capability for the selected period.</div>
+              </div>
+            </article>
+
+            <article class="chart-card">
+              <div class="card-header">
+                <div>
+                  <div class="card-title">Bundle adoption</div>
+                  <div class="card-meta">
+                    <span class="meta-pill">Widget: Bundle and Alliance Sales Board</span>
+                    <span class="meta-pill">Owner: Finance + Alliance Ops</span>
+                  </div>
+                </div>
+                <button class="card-cta" type="button">Manage bundles</button>
+              </div>
+              <div class="metric-row">
+                <div class="metric-value">58%</div>
+                <div class="metric-trend">up 3.6%</div>
+              </div>
+              <div class="funnel">
+                <div class="table-header"><span>Stage</span><span>Volume</span><span>Count</span></div>
+                <div class="funnel-row"><span>Bundle viewed</span><div class="funnel-bar" style="width:70px"></div><strong>820</strong></div>
+                <div class="funnel-row"><span>Quoted</span><div class="funnel-bar" style="width:52px"></div><strong>430</strong></div>
+                <div class="funnel-row"><span>Ordered</span><div class="funnel-bar" style="width:34px"></div><strong>186</strong></div>
+                <div class="formula-note"><strong>Master metrics:</strong> defined services, bundle orders, bundle pricing, discount usage, attach rate = orders_with_addon_service / total_orders.</div>
+              </div>
+            </article>
+          </div>
+        </section>
+
+      </section>
+      <section class="blank-screen" id="blankScreen" aria-label="Feature main screen">
+        <section class="feature-screen" id="siteSettingScreen">
+          <div class="screen-header">
+            <div>
+              <div class="breadcrumb">Partner Site Management / Site Setting</div>
+              <h1>Site Setting</h1>
+            </div>
+            <div class="screen-actions">
+              <button class="filter-button" type="button">Preview Site</button>
+              <button class="filter-button" type="button">Save Changes</button>
+            </div>
+          </div>
+
+          <div class="feature-summary">
+            <div class="feature-panel">
+              <h2>Partner Site Configuration</h2>
+              <div class="feature-desc">Manage the public-facing mini-site or tenant profile for the Partner. Changes here control how the Partner identity, capability, and visibility appear to enterprises.</div>
+              <div class="config-grid">
+                <div class="config-group wide">
+                  <h3 class="config-title">Media Assets</h3>
+                  <div class="config-list">
+                    <div class="config-list-header media-list-header"><span>Asset</span><span>Current File</span><span>Page Position</span><span>Action</span></div>
+                    <div class="media-list-row">
+                      <div class="asset-cell">
+                        <div class="upload-icon">+</div>
+                        <div class="upload-name">Logo</div>
+                      </div>
+                      <div class="upload-current">Arobid Partner Mark</div>
+                      <select class="config-select" aria-label="Logo page position">
+                        <option>Hero banner</option>
+                        <option>Middle banner</option>
+                        <option>Footer</option>
+                      </select>
+                      <button class="upload-button" type="button">Upload Logo</button>
+                    </div>
+                    <div class="media-list-row">
+                      <div class="asset-cell">
+                        <div class="upload-icon">+</div>
+                        <div class="upload-name">Background Image / Video</div>
+                      </div>
+                      <div class="upload-current">Default partner background</div>
+                      <select class="config-select" aria-label="Background page position">
+                        <option>Hero banner</option>
+                        <option selected>Middle banner</option>
+                        <option>Footer</option>
+                      </select>
+                      <button class="upload-button" type="button">Upload Background</button>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="config-group wide">
+                  <h3 class="config-title">Content</h3>
+                  <div class="config-list">
+                    <div class="config-list-header content-list-header"><span>Content Field</span><span>Current Content</span></div>
+                    <div class="content-list-row">
+                      <div class="field-label">Legal Name</div>
+                      <div class="form-field">
+                      <label for="partnerLegalName">Legal Name</label>
+                      <input class="form-input" id="partnerLegalName" type="text" value="Vietnam Export Alliance">
+                      </div>
+                    </div>
+                    <div class="content-list-row">
+                      <div class="field-label">Country</div>
+                      <div class="form-field">
+                      <label for="partnerCountry">Country</label>
+                      <input class="form-input" id="partnerCountry" type="text" value="Vietnam">
+                      </div>
+                    </div>
+                    <div class="content-list-row">
+                      <div class="field-label">Sector</div>
+                      <div class="form-field">
+                      <label for="partnerSector">Sector</label>
+                      <input class="form-input" id="partnerSector" type="text" value="Agriculture, Textile, Packaging">
+                      </div>
+                    </div>
+                    <div class="content-list-row">
+                      <div class="field-label">Active Capability</div>
+                      <div class="form-field">
+                      <label for="partnerCapability">Active Capability</label>
+                      <input class="form-input" id="partnerCapability" type="text" value="Expo, Trade Credit, Bundle">
+                      </div>
+                    </div>
+                    <div class="content-list-row">
+                      <div class="field-label">Short Introduction</div>
+                      <div class="form-field">
+                      <label for="partnerIntro">Short Introduction</label>
+                      <textarea class="form-textarea" id="partnerIntro">Trade promotion partner for export-ready enterprises</textarea>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="config-group wide">
+                  <h3 class="config-title">Status</h3>
+                  <div class="status-grid">
+                    <div class="status-control">
+                      <div>
+                        <div class="toggle-label">Site Status</div>
+                        <div class="status-copy">Active</div>
+                      </div>
+                      <label class="toggle-switch">
+                        <input type="checkbox" checked>
+                        <span class="toggle-track"></span>
+                      </label>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="feature-screen" id="enterpriseManagementScreen">
+          <div class="screen-header">
+            <div>
+              <div class="breadcrumb">Partner Site Management / Enterprise Management</div>
+              <h1>Enterprise Management</h1>
+            </div>
+            <div class="screen-actions">
+              <button class="filter-button" type="button">Filter</button>
+              <button class="filter-button" type="button">Export</button>
+            </div>
+          </div>
+
+          <div class="feature-summary">
+            <div class="feature-panel">
+              <h2>Partner Site Members</h2>
+              <div class="feature-desc">View and manage enterprises that belong to the Partner mini-site. This screen focuses on membership, join status, and enterprise detail access.</div>
+              <div class="feature-table member-table" style="margin-top:14px;">
+                <div class="feature-table-header"><span>Enterprise</span><span>Join Status</span><span>Action</span></div>
+                <div class="feature-table-row"><strong>Mekong Agri Export</strong><span class="status-pill">Joined</span><div class="action-menu"><button class="action-trigger" type="button">Actions <span>v</span></button><div class="action-panel"><button type="button">View Detail</button><button class="danger" type="button">Remove</button></div></div></div>
+                <div class="feature-table-row"><strong>Saigon Textile Hub</strong><span class="status-pill">Joined</span><div class="action-menu"><button class="action-trigger" type="button">Actions <span>v</span></button><div class="action-panel"><button type="button">View Detail</button><button class="danger" type="button">Remove</button></div></div></div>
+                <div class="feature-table-row"><strong>Danang Packaging Co</strong><span class="status-pill warn">Invited</span><div class="action-menu"><button class="action-trigger" type="button">Actions <span>v</span></button><div class="action-panel"><button type="button">View Detail</button><button class="danger" type="button">Remove</button></div></div></div>
+                <div class="feature-table-row"><strong>Hue Handicraft Group</strong><span class="status-pill">Joined</span><div class="action-menu"><button class="action-trigger" type="button">Actions <span>v</span></button><div class="action-panel"><button type="button">View Detail</button><button class="danger" type="button">Remove</button></div></div></div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="feature-screen" id="invitationScreen">
+          <div class="screen-header">
+            <div>
+              <div class="breadcrumb">Partner Site Management / Invitation</div>
+              <h1>Invitation</h1>
+            </div>
+            <div class="screen-actions">
+              <button class="filter-button" type="button">Copy Invite Link</button>
+              <button class="filter-button" type="button">Create Invitation</button>
+            </div>
+          </div>
+
+          <div class="feature-summary">
+            <div class="feature-panel">
+              <h2>Invitation Tracking</h2>
+              <div class="feature-desc">Create, send, and track invitations for enterprises to join the Partner mini-site. Each invitation should have a link or code, recipient, status, sent date, expiry date, and control actions.</div>
+              <div class="feature-table" style="margin-top:14px;">
+                <div class="feature-table-header"><span>Recipient</span><span>Status</span><span>Expiry</span><span>Action</span></div>
+                <div class="feature-table-row"><strong>contact@mekongagri.vn</strong><span class="status-pill">Accepted</span><span>2026-06-15</span><button class="card-cta" type="button">View</button></div>
+                <div class="feature-table-row"><strong>sales@saigontextile.vn</strong><span class="status-pill warn">Sent</span><span>2026-06-22</span><button class="card-cta" type="button">Resend</button></div>
+                <div class="feature-table-row"><strong>info@danangpack.vn</strong><span class="status-pill stop">Expired</span><span>2026-05-30</span><button class="card-cta" type="button">Renew</button></div>
+                <div class="feature-table-row"><strong>hello@huecraft.vn</strong><span class="status-pill warn">Sent</span><span>2026-06-28</span><button class="card-cta" type="button">Revoke</button></div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="feature-screen" id="expoDashboardScreen">
+          <div class="screen-header">
+            <div>
+              <div class="breadcrumb">Expo Programs / Dashboard</div>
+              <h1>Expo Program Dashboard</h1>
+            </div>
+            <div class="screen-actions">
+              <button class="filter-button" type="button">New Turnkey Request</button>
+              <button class="filter-button" type="button">Export</button>
+            </div>
+          </div>
+
+          <div class="feature-summary">
+            <div class="feature-panel">
+              <h2>Expo Program List</h2>
+              <div class="feature-desc">View Expo programs connected to this Partner and open the right management screen for each Expo.</div>
+              <div class="feature-table expo-table" style="margin-top:14px;">
+                <div class="feature-table-header"><span>Expo Program</span><span>Date</span><span>Booth</span><span>Sold</span><span>Status</span><span>Action</span></div>
+                <div class="feature-table-row"><strong>Agri Export Expo</strong><span>2026-07-12</span><span>148</span><span>106</span><span class="status-pill">Live</span><button class="card-cta" type="button">View Detail</button></div>
+                <div class="feature-table-row"><strong>Textile Sourcing Week</strong><span>2026-08-05</span><span>96</span><span>52</span><span class="status-pill warn">Await</span><button class="card-cta" type="button">View Detail</button></div>
+                <div class="feature-table-row"><strong>Packaging Innovation Fair</strong><span>2026-09-18</span><span>74</span><span>47</span><span class="status-pill warn">Await</span><button class="card-cta" type="button">View Detail</button></div>
+                <div class="feature-table-row"><strong>Electronics Trade Forum</strong><span>2026-10-03</span><span>112</span><span>46</span><span class="status-pill stop">Archieved</span><button class="card-cta" type="button">View Detail</button></div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="feature-screen" id="expoSettingScreen">
+          <div class="screen-header">
+            <div>
+              <div class="breadcrumb">Expo Programs / Expo Setting</div>
+              <h1>Expo Setting</h1>
+            </div>
+            <div class="screen-actions">
+              <button class="filter-button" type="button">Save Draft</button>
+              <button class="filter-button" type="button">Publish</button>
+            </div>
+          </div>
+
+          <div class="feature-summary">
+            <div class="feature-panel">
+              <h2>Expo List and General Metrics</h2>
+              <div class="feature-desc">System shows the Expo programs available for Partner setup, together with general metrics. When the user opens one Expo, the setting area below shows the selected Expo configuration.</div>
+
+              <div class="metric-strip">
+                <div class="metric-tile"><div class="metric-label">Total Expo</div><div class="metric-number">4</div></div>
+                <div class="metric-tile"><div class="metric-label">Live Expo</div><div class="metric-number">1</div></div>
+                <div class="metric-tile"><div class="metric-label">Draft Expo</div><div class="metric-number">2</div></div>
+                <div class="metric-tile"><div class="metric-label">Total Booth</div><div class="metric-number">430</div></div>
+              </div>
+
+              <div class="feature-table expo-setting-table" style="margin-top:14px;">
+                <div class="feature-table-header"><span>Expo</span><span>Status</span><span>Booth</span><span>Sold</span><span>Package Price</span><span>Action</span></div>
+                <div class="feature-table-row"><strong>Agri Export Expo</strong><span class="status-pill">Live</span><span>148</span><span>106</span><span>$280</span><button class="card-cta" type="button">View Detail</button></div>
+                <div class="feature-table-row"><strong>Textile Sourcing Week</strong><span class="status-pill warn">Await</span><span>96</span><span>52</span><span>$240</span><button class="card-cta" type="button">View Detail</button></div>
+                <div class="feature-table-row"><strong>Packaging Innovation Fair</strong><span class="status-pill warn">Await</span><span>74</span><span>47</span><span>$220</span><button class="card-cta" type="button">View Detail</button></div>
+                <div class="feature-table-row"><strong>Electronics Trade Forum</strong><span class="status-pill stop">Archieved</span><span>112</span><span>46</span><span>$260</span><button class="card-cta" type="button">View Detail</button></div>
+              </div>
+
+              <div class="detail-card">
+                <div class="detail-card-header">
+                  <div>
+                    <h3>Selected Expo Setting</h3>
+                    <div class="feature-desc" style="margin-top:4px;">Agri Export Expo is currently selected for editing.</div>
+                  </div>
+                  <div class="detail-actions">
+                    <button class="filter-button" type="button">Save Draft</button>
+                    <button class="filter-button" type="button">Publish</button>
+                  </div>
+                </div>
+
+                <div class="config-grid">
+                  <div class="config-group wide">
+                    <h3 class="config-title">Media Assets</h3>
+                    <div class="config-list">
+                      <div class="config-list-header media-list-header"><span>Asset</span><span>Current File</span><span>Page Position</span><span>Action</span></div>
+                      <div class="media-list-row">
+                        <div class="asset-cell">
+                          <div class="upload-icon">+</div>
+                          <div class="upload-name">Banner</div>
+                        </div>
+                        <div class="upload-current">agri-expo-hero.jpg</div>
+                        <select class="config-select" aria-label="Expo banner position">
+                          <option selected>Hero banner</option>
+                          <option>Middle banner</option>
+                          <option>Footer</option>
+                        </select>
+                        <button class="upload-button" type="button">Upload Banner</button>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="config-group wide">
+                    <h3 class="config-title">Expo Content</h3>
+                    <div class="config-list">
+                      <div class="config-list-header content-list-header"><span>Setting Field</span><span>Current Value</span></div>
+                      <div class="content-list-row">
+                        <div class="field-label">Expo Name</div>
+                        <div class="form-field">
+                          <label for="expoName">Expo Name</label>
+                          <input class="form-input" id="expoName" type="text" value="Agri Export Expo">
+                        </div>
+                      </div>
+                      <div class="content-list-row">
+                        <div class="field-label">Total Booth</div>
+                        <div class="form-field">
+                          <label for="expoBoothTotal">Total Booth</label>
+                          <input class="form-input" id="expoBoothTotal" type="text" value="148">
+                        </div>
+                      </div>
+                      <div class="content-list-row">
+                        <div class="field-label">Package Setting (Price)</div>
+                        <div class="form-field">
+                          <label for="expoPackagePrice">Package Setting (Price)</label>
+                          <input class="form-input" id="expoPackagePrice" type="text" value="$280 per booth">
+                        </div>
+                      </div>
+                      <div class="content-list-row">
+                        <div class="field-label">Short Description</div>
+                        <div class="form-field">
+                          <label for="expoDescription">Short Description</label>
+                          <textarea class="form-textarea" id="expoDescription">Trade expo for export-ready agriculture suppliers and international buyers.</textarea>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="config-group wide">
+                    <h3 class="config-title">Status</h3>
+                    <div class="status-grid">
+                      <div class="status-control">
+                        <div>
+                          <div class="toggle-label">Expo Status</div>
+                          <div class="status-copy">Live</div>
+                        </div>
+                        <label class="toggle-switch">
+                          <input type="checkbox" checked>
+                          <span class="toggle-track"></span>
+                        </label>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="feature-screen" id="expoInvitationScreen">
+          <div class="screen-header">
+            <div>
+              <div class="breadcrumb">Expo Programs / Invitation</div>
+              <h1>Expo Invitation</h1>
+            </div>
+            <div class="screen-actions">
+              <button class="filter-button" type="button">Copy Invite Link</button>
+              <button class="filter-button" type="button">Send Invitation</button>
+            </div>
+          </div>
+
+          <div class="feature-summary">
+            <div class="feature-panel">
+              <h2>Invite Code and Enterprise Invitations</h2>
+              <div class="feature-desc">Invite enterprises to the Arobid-created Expo by code or link. Each invitation keeps Partner attribution for invite performance and downstream activation tracking.</div>
+              <div class="feature-table invite-code-table" style="margin-top:14px;">
+                <div class="feature-table-header"><span>Expo</span><span>Invite Code / Link</span><span>Attribution</span><span>Action</span></div>
+                <div class="feature-table-row"><strong>Agri Export Expo</strong><span>AGRI-PARTNER-26</span><span>Vietnam Export Alliance</span><div class="action-menu"><button class="action-trigger" type="button">Actions <span>v</span></button><div class="action-panel"><button type="button">Copy Link</button><button type="button">Send Again</button></div></div></div>
+                <div class="feature-table-row"><strong>Textile Sourcing Week</strong><span>TEXTILE-VXA-26</span><span>Vietnam Export Alliance</span><div class="action-menu"><button class="action-trigger" type="button">Actions <span>v</span></button><div class="action-panel"><button type="button">Copy Link</button><button type="button">Send Again</button></div></div></div>
+              </div>
+              <div class="feature-table" style="margin-top:14px;">
+                <div class="feature-table-header"><span>Enterprise</span><span>Status</span><span>Expiry</span><span>Action</span></div>
+                <div class="feature-table-row"><strong>Mekong Agri Export</strong><span class="status-pill">Joined</span><span>2026-07-02</span><button class="card-cta" type="button">View</button></div>
+                <div class="feature-table-row"><strong>Saigon Textile Hub</strong><span class="status-pill warn">Sent</span><span>2026-07-08</span><button class="card-cta" type="button">Resend</button></div>
+                <div class="feature-table-row"><strong>Danang Packaging Co</strong><span class="status-pill warn">Draft</span><span>Not sent</span><button class="card-cta" type="button">Send</button></div>
+                <div class="feature-table-row"><strong>Hue Handicraft Group</strong><span class="status-pill stop">Expired</span><span>2026-06-11</span><button class="card-cta" type="button">Renew</button></div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="feature-screen" id="communicationChatScreen">
+          <div class="screen-header">
+            <div>
+              <div class="breadcrumb">Communication / Chat</div>
+              <h1>Chat</h1>
+            </div>
+            <div class="screen-actions">
+              <button class="filter-button" type="button">Unread Only</button>
+              <button class="filter-button" type="button">Open Inbox</button>
+            </div>
+          </div>
+
+          <div class="feature-summary">
+            <div class="feature-panel">
+              <h2>Partner Conversations</h2>
+              <div class="feature-desc">Regular chat threads use the user email and show where the conversation started, so the user can return to the related workflow quickly.</div>
+
+              <div class="metric-strip">
+                <div class="metric-tile"><div class="metric-label">Unread Chat</div><div class="metric-number">5</div></div>
+                <div class="metric-tile"><div class="metric-label">Open Thread</div><div class="metric-number">12</div></div>
+                <div class="metric-tile"><div class="metric-label">Awaiting Reply</div><div class="metric-number">3</div></div>
+                <div class="metric-tile"><div class="metric-label">Today Messages</div><div class="metric-number">28</div></div>
+              </div>
+
+              <div class="feature-table communication-chat-table" style="margin-top:14px;">
+                <div class="feature-table-header"><span>Contact</span><span>Started From</span><span>Latest Message</span><span>Unread</span><span>Action</span></div>
+                <div class="feature-table-row"><strong>buyer@agriworld.com</strong><span>Expo Invitation</span><span>Can you confirm the booth package for Hall A?</span><span class="nav-badge">2</span><button class="card-cta" type="button">Open Chat</button></div>
+                <div class="feature-table-row"><strong>sales@saigontextile.vn</strong><span>Partner Site Member</span><span>We need support to update company profile.</span><span class="nav-badge">1</span><button class="card-cta" type="button">Open Chat</button></div>
+                <div class="feature-table-row"><strong>expo.ops@arobid.com</strong><span>Expo Setting</span><span>Banner upload is approved for publishing.</span><span class="nav-badge">1</span><button class="card-cta" type="button">Open Chat</button></div>
+                <div class="feature-table-row"><strong>contact@mekongagri.vn</strong><span>Trade Credit Wallet</span><span>Please share the settlement confirmation.</span><span class="nav-badge">1</span><button class="card-cta" type="button">Open Chat</button></div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="feature-screen" id="communicationNotificationScreen">
+          <div class="screen-header">
+            <div>
+              <div class="breadcrumb">Communication / Notification</div>
+              <h1>Notification</h1>
+            </div>
+            <div class="screen-actions">
+              <button class="filter-button" type="button">Mark All Read</button>
+              <button class="filter-button" type="button">Notification Setting</button>
+            </div>
+          </div>
+
+          <div class="feature-summary">
+            <div class="feature-panel">
+              <h2>Notification List</h2>
+              <div class="feature-desc">System shows regular notifications for operational updates, invitation events, and activity from related workflows.</div>
+
+              <div class="metric-strip">
+                <div class="metric-tile"><div class="metric-label">Unread Notification</div><div class="metric-number">8</div></div>
+                <div class="metric-tile"><div class="metric-label">Expo Update</div><div class="metric-number">3</div></div>
+                <div class="metric-tile"><div class="metric-label">Member Activity</div><div class="metric-number">2</div></div>
+                <div class="metric-tile"><div class="metric-label">System Notice</div><div class="metric-number">3</div></div>
+              </div>
+
+              <div class="notification-feed">
+                <button class="notification-item" type="button" data-notification-type="Expo" data-notification-title="Agri Export Expo was published successfully." data-notification-pretext="Your Expo page is now live and visible to invited enterprises." data-notification-detail="The selected Expo passed the final setup checks and was published by the Partner. Enterprises can now access the Expo page, view package details, and continue the invitation journey." data-notification-module="Expo Setting" data-notification-time="5 min ago">
+                  <span class="status-pill">Expo</span>
+                  <span class="notification-body">
+                    <span class="notification-title">Agri Export Expo was published successfully.</span>
+                    <span class="notification-pretext">Your Expo page is now live and visible to invited enterprises.</span>
+                    <span class="notification-meta"><span>Expo Setting</span><span>Publish update</span></span>
+                  </span>
+                  <span class="notification-time">5 min ago</span>
+                </button>
+
+                <button class="notification-item" type="button" data-notification-type="Invitation" data-notification-title="Mekong Agri Export accepted the Expo invitation." data-notification-pretext="The enterprise joined through the Partner invitation link and attribution was recorded." data-notification-detail="The invitation status has moved to accepted. The enterprise is now connected to the Expo and the Partner attribution remains attached for downstream reporting and performance tracking." data-notification-module="Expo Invitation" data-notification-time="18 min ago">
+                  <span class="status-pill">Invitation</span>
+                  <span class="notification-body">
+                    <span class="notification-title">Mekong Agri Export accepted the Expo invitation.</span>
+                    <span class="notification-pretext">The enterprise joined through the Partner invitation link and attribution was recorded.</span>
+                    <span class="notification-meta"><span>Expo Invitation</span><span>Member joined</span></span>
+                  </span>
+                  <span class="notification-time">18 min ago</span>
+                </button>
+
+                <button class="notification-item" type="button" data-notification-type="Finance" data-notification-title="Settlement statement is ready for review." data-notification-pretext="A new finance statement was generated for the current settlement cycle." data-notification-detail="The latest settlement statement is available in Finance and Settlement. Review the billing breakdown, payment status, and any pending items before confirming the cycle." data-notification-module="Finance and Settlement" data-notification-time="1 hour ago">
+                  <span class="status-pill warn">Finance</span>
+                  <span class="notification-body">
+                    <span class="notification-title">Settlement statement is ready for review.</span>
+                    <span class="notification-pretext">A new finance statement was generated for the current settlement cycle.</span>
+                    <span class="notification-meta"><span>Finance and Settlement</span><span>Review required</span></span>
+                  </span>
+                  <span class="notification-time">1 hour ago</span>
+                </button>
+
+                <button class="notification-item" type="button" data-notification-type="System" data-notification-title="Partner site banner update was approved." data-notification-pretext="The updated banner asset passed review and is ready to use on the site." data-notification-detail="The Partner site banner upload was approved by the system review flow. You can keep the approved asset in draft mode or publish it directly from Site Setting." data-notification-module="Partner Site Management" data-notification-time="Today, 09:24">
+                  <span class="status-pill stop">System</span>
+                  <span class="notification-body">
+                    <span class="notification-title">Partner site banner update was approved.</span>
+                    <span class="notification-pretext">The updated banner asset passed review and is ready to use on the site.</span>
+                    <span class="notification-meta"><span>Partner Site Management</span><span>Asset approval</span></span>
+                  </span>
+                  <span class="notification-time">Today, 09:24</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <div class="notification-modal" id="notificationModal" aria-hidden="true">
+          <div class="notification-dialog" role="dialog" aria-modal="true" aria-labelledby="notificationModalTitle">
+            <div class="notification-dialog-header">
+              <div>
+                <span class="status-pill" id="notificationModalType">Expo</span>
+                <h2 class="notification-dialog-title" id="notificationModalTitle">Notification detail</h2>
+              </div>
+              <button class="filter-button" id="notificationModalClose" type="button">Close</button>
+            </div>
+            <div class="notification-dialog-body">
+              <div class="notification-meta" style="margin-top:0;"><span id="notificationModalModule">Module</span><span id="notificationModalTime">Time</span></div>
+              <p id="notificationModalPretext" style="margin:14px 0 0;"></p>
+              <p id="notificationModalDetail" style="margin:14px 0 0;"></p>
+            </div>
+            <div class="notification-dialog-footer">
+              <button class="filter-button" id="notificationModalAction" type="button">Open Related Module</button>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    const tabs = [
+      {
+        level1: "Overview",
+        level2: []
+      },
+      {
+        level1: "Partner Site Management",
+        level2: ["Site Setting", "Enterprise Management", "Invitation"]
+      },
+      {
+        level1: "Expo Programs",
+        level2: ["Dashboard", "Expo Setting", "Invitation"]
+      },
+      {
+        level1: "Trade Credit Wallet",
+        level2: []
+      },
+      {
+        level1: "Package Management",
+        level2: ["Bundle Creation", "Bundle Pricing"]
+      },
+      {
+        level1: "Communication",
+        level2: ["Chat", "Notification"]
+      },
+      {
+        level1: "Finance and Settlement",
+        level2: ["Platform Billing", "Payment Management"]
+      },
+      {
+        level1: "Analytics and Reports",
+        level2: ["Expo overview", "Trade activity", "Expo performance", "Industry insight"]
+      }
+    ];
+
+    const unreadBadges = {
+      "Communication": 13,
+      "Communication::Chat": 5,
+      "Communication::Notification": 8
+    };
+
+    const nav = document.getElementById("sidebarNav");
+    const overviewScreen = document.getElementById("overviewScreen");
+    const blankScreen = document.getElementById("blankScreen");
+
+    const screensByModule = {
+      "Partner Site Management": {
+        "Site Setting": "siteSettingScreen",
+        "Enterprise Management": "enterpriseManagementScreen",
+        "Invitation": "invitationScreen"
+      },
+      "Expo Programs": {
+        "Dashboard": "expoDashboardScreen",
+        "Expo Setting": "expoSettingScreen",
+        "Invitation": "expoInvitationScreen"
+      },
+      "Communication": {
+        "Chat": "communicationChatScreen",
+        "Notification": "communicationNotificationScreen"
+      }
+    };
+
+    const defaultSubtabs = {
+      "Partner Site Management": "Site Setting",
+      "Expo Programs": "Dashboard",
+      "Communication": "Chat"
+    };
+
+    function showScreen(moduleName, subtabName = "") {
+      const isOverview = moduleName === "Overview";
+      overviewScreen.classList.toggle("hidden", !isOverview);
+      blankScreen.classList.toggle("active", !isOverview);
+
+      document.querySelectorAll(".feature-screen").forEach((screen) => {
+        screen.classList.remove("active");
+      });
+
+      if (screensByModule[moduleName]) {
+        const fallbackSubtab = defaultSubtabs[moduleName];
+        const screenId = screensByModule[moduleName][subtabName] || screensByModule[moduleName][fallbackSubtab];
+        const screen = document.getElementById(screenId);
+        if (screen) {
+          screen.classList.add("active");
+        }
+      }
+    }
+
+    function selectNavigation(moduleName, subtabName = "") {
+      document.querySelectorAll(".module").forEach((item) => {
+        const isTarget = item.dataset.module === moduleName;
+        item.classList.toggle("selected", isTarget);
+        item.classList.toggle("open", isTarget && Boolean(item.querySelector(".subnav")));
+        item.querySelector(".module-button").setAttribute("aria-expanded", String(isTarget && Boolean(item.querySelector(".subnav"))));
+      });
+
+      const effectiveSubtab = !subtabName && defaultSubtabs[moduleName] ? defaultSubtabs[moduleName] : subtabName;
+
+      document.querySelectorAll(".subnav button").forEach((item) => {
+        item.classList.remove("active");
+      });
+
+      const activeModule = document.querySelector(`.module[data-module="${moduleName}"]`);
+      activeModule?.querySelectorAll(".subnav button").forEach((item) => {
+        item.classList.toggle("active", Boolean(effectiveSubtab) && item.dataset.subtab === effectiveSubtab);
+      });
+
+      showScreen(moduleName, effectiveSubtab);
+    }
+
+    nav.innerHTML = tabs.map((tab, index) => {
+      const code = String(index + 1).padStart(2, "0");
+      const subnav = tab.level2.length
+        ? `<div class="subnav">${tab.level2.map((item) => {
+            const subBadge = unreadBadges[`${tab.level1}::${item}`];
+            return `<button type="button" data-subtab="${item}"><span class="subnav-label">${item}${subBadge ? `<span class="nav-badge">${subBadge}</span>` : ""}</span></button>`;
+          }).join("")}</div>`
+        : "";
+      const moduleBadge = unreadBadges[tab.level1];
+
+      return `
+        <div class="module${index === 0 ? " selected" : ""}" data-module="${tab.level1}">
+          <button class="module-button" type="button" aria-expanded="false">
+            <span class="nav-code">${code}</span>
+            <span class="module-title">${tab.level1}${moduleBadge ? `<span class="nav-badge">${moduleBadge}</span>` : ""}</span>
+            <span class="chevron">${tab.level2.length ? ">" : ""}</span>
+          </button>
+          ${subnav}
+        </div>
+      `;
+    }).join("");
+
+    document.querySelectorAll(".module-button").forEach((button) => {
+      button.addEventListener("click", () => {
+        const module = button.closest(".module");
+        const hasSubnav = Boolean(module.querySelector(".subnav"));
+        const willOpen = !module.classList.contains("open");
+
+        document.querySelectorAll(".module").forEach((item) => {
+          item.classList.remove("open");
+          item.classList.remove("selected");
+          item.querySelector(".module-button").setAttribute("aria-expanded", "false");
+        });
+        document.querySelectorAll(".subnav button").forEach((item) => item.classList.remove("active"));
+
+        module.classList.add("selected");
+        const defaultSubtab = defaultSubtabs[module.dataset.module] || "";
+        showScreen(module.dataset.module, defaultSubtab);
+
+        if (hasSubnav && willOpen) {
+          module.classList.add("open");
+          button.setAttribute("aria-expanded", "true");
+          if (defaultSubtab) {
+            module.querySelectorAll(".subnav button").forEach((item) => {
+              item.classList.toggle("active", item.dataset.subtab === defaultSubtab);
+            });
+          }
+        }
+      });
+    });
+
+    document.querySelectorAll(".subnav button").forEach((button) => {
+      button.addEventListener("click", () => {
+        document.querySelectorAll(".subnav button").forEach((item) => item.classList.remove("active"));
+        button.classList.add("active");
+        const module = button.closest(".module");
+        document.querySelectorAll(".module").forEach((item) => item.classList.remove("selected"));
+        module.classList.add("selected");
+        showScreen(module.dataset.module, button.dataset.subtab || "");
+      });
+    });
+
+    const ctaTargets = {
+      "View members": ["Partner Site Management", "Enterprise Management"],
+      "View expo": ["Expo Programs", "Dashboard"],
+      "Open tasks": ["Overview", ""],
+      "Manage booths": ["Expo Programs", "Dashboard"],
+      "Open Expo Programs": ["Expo Programs", "Dashboard"],
+      "View report": ["Analytics and Reports", "Expo performance"],
+      "View trade report": ["Analytics and Reports", "Trade activity"],
+      "Open wallet": ["Trade Credit Wallet", ""],
+      "View RFQ report": ["Analytics and Reports", "Trade activity"],
+      "Open Finance": ["Finance and Settlement", "Platform Billing"],
+      "View analysis": ["Finance and Settlement", "Payment Management"],
+      "Manage bundles": ["Package Management", "Bundle Creation"]
+    };
+
+    document.querySelectorAll(".card-cta").forEach((button) => {
+      button.addEventListener("click", () => {
+        const target = ctaTargets[button.textContent.trim()];
+        if (target) {
+          selectNavigation(target[0], target[1]);
+        }
+      });
+    });
+
+    const notificationModal = document.getElementById("notificationModal");
+    const notificationModalType = document.getElementById("notificationModalType");
+    const notificationModalTitle = document.getElementById("notificationModalTitle");
+    const notificationModalModule = document.getElementById("notificationModalModule");
+    const notificationModalTime = document.getElementById("notificationModalTime");
+    const notificationModalPretext = document.getElementById("notificationModalPretext");
+    const notificationModalDetail = document.getElementById("notificationModalDetail");
+    const notificationModalClose = document.getElementById("notificationModalClose");
+
+    function closeNotificationModal() {
+      notificationModal?.classList.remove("open");
+      notificationModal?.setAttribute("aria-hidden", "true");
+    }
+
+    document.querySelectorAll(".notification-item").forEach((item) => {
+      item.addEventListener("click", () => {
+        notificationModalType.textContent = item.dataset.notificationType || "";
+        notificationModalTitle.textContent = item.dataset.notificationTitle || "";
+        notificationModalModule.textContent = item.dataset.notificationModule || "";
+        notificationModalTime.textContent = item.dataset.notificationTime || "";
+        notificationModalPretext.textContent = item.dataset.notificationPretext || "";
+        notificationModalDetail.textContent = item.dataset.notificationDetail || "";
+        notificationModal.classList.add("open");
+        notificationModal.setAttribute("aria-hidden", "false");
+      });
+    });
+
+    notificationModalClose?.addEventListener("click", closeNotificationModal);
+    notificationModal?.addEventListener("click", (event) => {
+      if (event.target === notificationModal) {
+        closeNotificationModal();
+      }
+    });
+  </script>
+</body>
+</html>
