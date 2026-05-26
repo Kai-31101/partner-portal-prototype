@@ -1,103 +1,143 @@
-import { MessageCircle, Filter, Mail } from 'lucide-react';
-import DateRangeFilter from './DateRangeFilter';
-import FilterDropdown from './FilterDropdown';
+import { useState } from 'react';
+import { Search } from 'lucide-react';
 
 export default function CommunicationChat() {
-  const chats = [
-    { contact: 'buyer@agriworld.com', source: 'Expo Invitation', message: 'Can you confirm the booth package for Hall A?', unread: 2 },
-    { contact: 'sales@saigontextile.vn', source: 'Partner Site Member', message: 'We need support to update company profile.', unread: 1 },
-    { contact: 'expo.ops@arobid.com', source: 'Expo Setting', message: 'Banner upload is approved for publishing.', unread: 1 },
-    { contact: 'contact@mekongagri.vn', source: 'Trade Credit Wallet', message: 'Please share the settlement confirmation.', unread: 1 },
+  const conversations = [
+    {
+      id: 'agriworld',
+      name: 'Agri World Buyer',
+      company: 'AgriWorld Imports',
+      lastMessage: 'Can you confirm the booth package for Hall A?',
+      time: '09:42',
+      unread: 2,
+      messages: [
+        { from: 'Agri World Buyer', text: 'Can you confirm the booth package for Hall A?', time: '09:40' },
+        { from: 'Peak Outfitters', text: 'Yes, Hall A package includes the standard booth setup and visitor lead report.', time: '09:42' },
+      ],
+    },
+    {
+      id: 'saigon-textile',
+      name: 'Saigon Textile Hub',
+      company: 'Saigon Textile Hub',
+      lastMessage: 'We need support to update company profile.',
+      time: 'Yesterday',
+      unread: 1,
+      messages: [
+        { from: 'Saigon Textile Hub', text: 'We need support to update company profile before publishing.', time: 'Yesterday' },
+      ],
+    },
+    {
+      id: 'mekong-agri',
+      name: 'Mekong Agri Export',
+      company: 'Mekong Agri Export',
+      lastMessage: 'Please share the settlement confirmation.',
+      time: 'Mon',
+      unread: 0,
+      messages: [
+        { from: 'Mekong Agri Export', text: 'Please share the settlement confirmation.', time: 'Mon' },
+        { from: 'Peak Outfitters', text: 'The confirmation is being checked by our finance team.', time: 'Mon' },
+      ],
+    },
   ];
+  const [selectedId, setSelectedId] = useState(conversations[0].id);
+  const selectedConversation = conversations.find((conversation) => conversation.id === selectedId);
 
   return (
-    <div className="flex-1 bg-gradient-to-br from-gray-50 via-blue-50/30 to-gray-50 overflow-auto">
-      {/* Header */}
-      <div className="bg-white border-b border-gray-200 px-8 py-6 shadow-lg sticky top-0 z-[100]">
-        <div className="mb-4">
-          <div className="text-sm text-gray-500 mb-2 font-medium">
-            Communication / Chat
-          </div>
-          <h1 className="text-4xl font-bold bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900 bg-clip-text text-transparent">
-            Chat
-          </h1>
-        </div>
-        <div className="flex gap-3 justify-end">
-          <DateRangeFilter />
-          <FilterDropdown
-            label="All Messages"
-            icon={<Filter size={18} />}
-            options={[
-              { value: 'all', label: 'All Messages' },
-              { value: 'unread', label: 'Unread Only' },
-              { value: 'read', label: 'Read Only' },
-              { value: 'awaiting-reply', label: 'Awaiting Reply' },
-              { value: 'archived', label: 'Archived' },
-            ]}
-          />
-          <button className="px-6 py-3 font-semibold text-white bg-gradient-to-r from-teal-600 to-teal-700 rounded-xl hover:from-teal-700 hover:to-teal-800 transition-all shadow-lg hover:shadow-xl hover:scale-105 transform flex items-center gap-2">
-            <Mail size={18} />
-            Open Inbox
-          </button>
-        </div>
-      </div>
+    <main className="min-h-[calc(100vh-89px)] bg-white p-3">
+      <section className="flex min-h-[calc(100vh-113px)] overflow-hidden rounded-lg border border-[#D7E0EA] bg-white">
+        <aside className="flex w-[300px] shrink-0 flex-col border-r border-[#D7E0EA] bg-white px-4 py-5">
+          <h2 className="mb-4 text-base font-bold text-[#0F172A]">Deal Room</h2>
 
-      {/* Content */}
-      <div className="px-8 py-8">
-        <div className="bg-white border border-gray-200/50 rounded-2xl p-8 shadow-xl">
-          <div className="flex items-center gap-3 mb-2">
-            <div className="p-2 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-lg shadow-lg">
-              <MessageCircle size={24} className="text-white" />
-            </div>
-            <h2 className="text-2xl font-bold text-gray-900">Partner Conversations</h2>
-          </div>
-          <p className="text-gray-600 mb-8 ml-14">
-            Regular chat threads use the user email and show where the conversation started, so the user can return to the related workflow quickly.
-          </p>
+          <label className="mb-3 flex h-9 items-center gap-2 rounded-md border border-[#D7E0EA] bg-white px-3 text-sm text-[#94A3B8]">
+            <Search size={16} />
+            <input
+              className="min-w-0 flex-1 border-0 bg-transparent text-sm text-[#0F172A] outline-none placeholder:text-[#94A3B8]"
+              placeholder="Search by name or company..."
+              type="search"
+            />
+          </label>
 
-          {/* Metrics */}
-          <div className="grid grid-cols-4 gap-4 mb-8">
-            {[
-              { label: 'Unread Chat', value: '5', color: 'from-blue-500 to-indigo-600' },
-              { label: 'Open Thread', value: '12', color: 'from-teal-500 to-cyan-600' },
-              { label: 'Awaiting Reply', value: '3', color: 'from-amber-500 to-orange-600' },
-              { label: 'Today Messages', value: '28', color: 'from-purple-500 to-pink-600' },
-            ].map((metric, idx) => (
-              <div key={idx} className="border border-gray-200 rounded-xl p-4 bg-gradient-to-br from-gray-50 to-white hover:shadow-md transition-shadow">
-                <div className="text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">{metric.label}</div>
-                <div className={`text-3xl font-bold bg-gradient-to-r ${metric.color} bg-clip-text text-transparent`}>{metric.value}</div>
-              </div>
-            ))}
+          <div className="mb-8 grid grid-cols-2 rounded-md bg-[#F4F4F5] p-0.5">
+            <button className="h-8 rounded-md bg-[#F56600] text-sm font-semibold text-white shadow-sm" type="button">
+              Inbox
+            </button>
+            <button className="h-8 rounded-md text-sm font-semibold text-[#64748B]" type="button">
+              Archived
+            </button>
           </div>
 
-          {/* Chat List */}
-          <div className="border border-gray-200/50 rounded-xl overflow-hidden bg-white shadow-lg">
-            <div className="grid grid-cols-[1fr_0.8fr_1.5fr_0.4fr_0.4fr] gap-4 px-6 py-4 bg-gradient-to-r from-gray-50 to-gray-100 border-b border-gray-200 text-xs font-bold text-gray-600 uppercase tracking-wide">
-              <span>Contact</span>
-              <span>Started From</span>
-              <span>Latest Message</span>
-              <span>Unread</span>
-              <span>Action</span>
-            </div>
-            {chats.map((chat, idx) => (
-              <div
-                key={idx}
-                className="grid grid-cols-[1fr_0.8fr_1.5fr_0.4fr_0.4fr] gap-4 px-6 py-4 font-medium text-gray-700 border-b border-gray-100 hover:bg-gradient-to-r hover:from-blue-50/30 hover:to-indigo-50/30 transition-all duration-200 cursor-pointer"
+          <div className="min-h-0 flex-1 space-y-1 overflow-y-auto">
+            {conversations.map((conversation) => (
+              <button
+                key={conversation.id}
+                className={`w-full rounded-lg border px-3 py-3 text-left transition ${
+                  selectedId === conversation.id
+                    ? 'border-[#F56600] bg-[#FFF7ED]'
+                    : 'border-transparent hover:border-[#D7E0EA] hover:bg-[#F8FAFC]'
+                }`}
+                onClick={() => setSelectedId(conversation.id)}
+                type="button"
               >
-                <strong className="text-gray-900">{chat.contact}</strong>
-                <span className="text-gray-700">{chat.source}</span>
-                <span className="text-gray-600">{chat.message}</span>
-                <span className="bg-teal-600 text-white text-xs font-bold px-2 py-1 rounded-full min-w-[22px] text-center h-6 flex items-center justify-center">
-                  {chat.unread}
-                </span>
-                <button className="px-4 py-2 text-sm font-semibold text-blue-600 hover:text-blue-700 transition-colors">
-                  Open Chat
-                </button>
-              </div>
+                <div className="mb-1 flex items-start justify-between gap-2">
+                  <div className="min-w-0">
+                    <div className="truncate text-sm font-bold text-[#0F172A]">{conversation.name}</div>
+                    <div className="truncate text-xs text-[#64748B]">{conversation.company}</div>
+                  </div>
+                  <span className="shrink-0 text-xs text-[#94A3B8]">{conversation.time}</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <p className="min-w-0 flex-1 truncate text-sm text-[#64748B]">{conversation.lastMessage}</p>
+                  {conversation.unread > 0 && (
+                    <span className="flex h-5 min-w-5 shrink-0 items-center justify-center rounded-full bg-[#F56600] px-1.5 text-xs font-bold text-white">
+                      {conversation.unread}
+                    </span>
+                  )}
+                </div>
+              </button>
             ))}
           </div>
-        </div>
-      </div>
-    </div>
+        </aside>
+
+        <section className="relative min-w-0 flex-1 bg-white">
+          {selectedConversation ? (
+            <div className="flex h-full min-h-[calc(100vh-113px)] flex-col">
+              <div className="border-b border-[#D7E0EA] px-6 py-4">
+                <h3 className="text-base font-bold text-[#0F172A]">{selectedConversation.name}</h3>
+                <p className="text-sm text-[#64748B]">{selectedConversation.company}</p>
+              </div>
+              <div className="flex-1 space-y-4 overflow-y-auto px-6 py-6">
+                {selectedConversation.messages.map((message, index) => {
+                  const isPartner = message.from === 'Peak Outfitters';
+                  return (
+                    <div key={`${message.from}-${index}`} className={`flex ${isPartner ? 'justify-end' : 'justify-start'}`}>
+                      <div
+                        className={`max-w-[520px] rounded-xl border px-4 py-3 ${
+                          isPartner
+                            ? 'border-[#D7E0EA] bg-[#F8FAFC]'
+                            : 'border-[#D7E0EA] bg-white'
+                        }`}
+                      >
+                        <div className="mb-1 text-xs font-semibold text-[#64748B]">{message.from}</div>
+                        <div className="text-sm leading-5 text-[#0F172A]">{message.text}</div>
+                        <div className="mt-2 text-right text-xs text-[#94A3B8]">{message.time}</div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+              <div className="border-t border-[#D7E0EA] p-4">
+                <div className="flex min-h-11 items-center rounded-lg border border-[#D7E0EA] bg-[#F8FAFC] px-4 text-sm text-[#94A3B8]">
+                  Message composer placeholder
+                </div>
+              </div>
+            </div>
+          ) : (
+            <div className="absolute inset-0 flex items-center justify-center px-6 text-center text-sm font-medium text-[#64748B]">
+              Select a conversation to start chatting.
+            </div>
+          )}
+        </section>
+      </section>
+    </main>
   );
 }

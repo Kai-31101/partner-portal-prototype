@@ -6,9 +6,7 @@ import SiteSetting from './components/SiteSetting';
 import EnterpriseManagement from './components/EnterpriseManagement';
 import Invitation from './components/Invitation';
 import BannerManagement from './components/BannerManagement';
-import ExpoDashboard from './components/ExpoDashboard';
-import ExpoSetting from './components/ExpoSetting';
-import ExpoInvitation from './components/ExpoInvitation';
+import ExpoProgramsTransferNotice from './components/ExpoProgramsTransferNotice';
 import CommunicationChat from './components/CommunicationChat';
 import CommunicationNotification from './components/CommunicationNotification';
 import PartnerProfile from './components/PartnerProfile';
@@ -24,7 +22,7 @@ export default function App() {
 
   const handleNavigation = (module: string, subtab: string = '') => {
     setCurrentModule(module);
-    setCurrentSubtab(subtab);
+    setCurrentSubtab(module === 'Expo Programs' ? '' : subtab);
   };
 
   const pageContext = currentSubtab ? `${currentModule} / ${currentSubtab}` : `Partner Portal / ${currentModule}`;
@@ -46,9 +44,7 @@ export default function App() {
 
     // Expo Programs
     if (currentModule === 'Expo Programs') {
-      if (currentSubtab === 'Dashboard') return <ExpoDashboard />;
-      if (currentSubtab === 'Expo Setting') return <ExpoSetting />;
-      if (currentSubtab === 'Invitation') return <ExpoInvitation />;
+      return <ExpoProgramsTransferNotice />;
     }
 
     // Communication

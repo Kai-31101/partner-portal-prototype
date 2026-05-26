@@ -7,7 +7,7 @@ interface ComingSoonProps {
 
 export default function ComingSoon({ moduleName, subtab }: ComingSoonProps) {
   return (
-    <div className="flex-1 bg-gradient-to-br from-gray-50 via-blue-50/30 to-gray-50 overflow-auto flex items-center justify-center">
+    <div className="flex min-h-[calc(100vh-89px)] items-center justify-center bg-gradient-to-br from-gray-50 via-blue-50/30 to-gray-50 p-6">
       <div className="text-center">
         <div className="inline-flex p-6 bg-gradient-to-br from-violet-100 to-purple-100 rounded-full mb-6">
           <Rocket size={64} className="text-violet-600" />

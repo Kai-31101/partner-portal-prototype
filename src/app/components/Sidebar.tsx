@@ -20,15 +20,7 @@ const navModules: NavModule[] = [
       { id: 'invitation', label: 'Invitation' },
     ],
   },
-  {
-    title: 'Expo Programs',
-    defaultSubtab: 'Dashboard',
-    subitems: [
-      { id: 'dashboard', label: 'Dashboard' },
-      { id: 'expo-setting', label: 'Expo Setting' },
-      { id: 'invitation', label: 'Invitation' },
-    ],
-  },
+  { title: 'Expo Programs' },
   { title: 'Trade Credit Wallet', placeholder: true },
   {
     title: 'Package Management',
